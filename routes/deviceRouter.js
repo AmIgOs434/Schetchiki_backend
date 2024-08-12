@@ -23,6 +23,6 @@ router.post('/createSchetchiki', deviceController.createSchetchiki)
 
 
 
-router.post('/createSchetchiki_by_data', deviceController.createSchetchiki_by_data)
+router.post('/createSchetchiki_by_data', deviceController.createSchetchiki1)
 
 module.exports = router

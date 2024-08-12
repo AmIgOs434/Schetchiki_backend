@@ -5,7 +5,9 @@ const ApiError = require('../error/ApiError');
 const jwt = require('jsonwebtoken')
 const { Op, where } = require('sequelize');
 const fs = require('node:fs');
-
+const FormData = require('form-data');
+var request = require('request');
+const axios = require('axios')
 const generateJwt = (id) => {
   return jwt.sign(
       {id},
@@ -14,7 +16,7 @@ const generateJwt = (id) => {
   )
 }
 
-
+var XMLHttpRequest = require("xmlhttprequest").XMLHttpRequest;
 
 class deviceController {
 
@@ -28,7 +30,7 @@ async reg(req, res, next) {
         email:email
       })
       const token = generateJwt(user_0.id)
-      return res.json({token})
+      return res.json(user_0.id)
   }
 
 
@@ -83,15 +85,325 @@ async getSchetchik_data_one(req, res) {
 
 
 async createSchetchiki(req, res) {
+  const {number_schet,name,photo,zadolz_po_schetchiku,data,name1,UserId,latitude,longitude,namePhoto} = req.body
+  console.log(photo)
+  const Schetchik_ = await Schetchik.create({
+    name:name1,
+    UserId:UserId
+  })
 
-        const vv = fs.open(`./static/2psskovcux4.jpeg`, 'r', (err, fd) => {
+
+
+  var base64Data = photo.split(",")[1];// split with `,`
+
+   const aa = require("fs").writeFile(`./static/${namePhoto}.jpeg`, base64Data, 'base64', 
+   async function(err, data) {
+       if (err) {
+      console.log('err', err);
+         }
+         let stats = fs.statSync(`./static/${namePhoto}.jpeg`)
+
+        //  const resp1 = await axios.post('http://79.174.92.222:8000/upload-image/',formData)
+        //     .then(function(response1) {
+        //       console.log('response1')
+        //      console.log(response1)
+        //      return
+        //     }).catch(function(error) {
+        //       console.log(error)
+        //       console.log('response1')
+        //     })
       
-  
-        })
 
-        return res.json(vv)
+         const form = new FormData();
+         form.append('image', fs.createReadStream(`./static/sh.jpeg`));
+
+         await axios.post('http://79.174.92.222:8000/upload-image/', form,{
+                headers: {
+                  'Content-Type': 'multipart/form-data'
+                }
+              }).then(async function(response20) {
+
+                const resp = await  axios.get('http://79.174.92.222:8000/api/data/?limit=1005')
+                .then(async function(response1) {
+                  console.log('response1')
+                 console.log(response1.data.count)
+                 console.log(response1.data.results[response1.data.count-1]['meter'])
+                 console.log(response1.data.results[response1.data.count-1]['qr']==[])
+                 const opo1 = await axios.post(`http://s5.oooblako.ru/systema_base1/hs/KVK_API_NEWMETER/CREATENEWMETER/${UserId}/${Schetchik_.id}`).then(async function(response2) {
+        
+                 console.log(response2)
+                 if(response1.data.results[response1.data.count-1]['qr']==[]){
+                  const opo = await axios.post(`http://s5.oooblako.ru/systema_base1/hs/KVK_API_NEWREPORT/CREATENEWREPORT/${UserId}/${Schetchik_.id}/${response1.data.results[response1.data.count-1]['meter']}/0000000`).then(async function(response3) {
+        
+                  const Schetchik1 = await Schetchik_data.create({
+                    number_schet:number_schet,
+                    name:name,
+                    photo:`/${namePhoto}.jpeg`,
+                    zadolz_po_schetchiku:response3.data.arrears,
+                    data:data,
+                    SchetchikId:Schetchik_.id,
+                    latitude:latitude,
+                    longitude:longitude,
+                    unpaid:response3.data.unpaid,
+                    arrears:response3.data.arrears,
+                    meterdata:response3.data.meterdata,
+        
+                  });
+                  
+                  console.log(response3.data)
+                  return res.json(Schetchik1)
+                 })
+            
+                }else{
+                const opo = await axios.post(`http://s5.oooblako.ru/systema_base1/hs/KVK_API_NEWREPORT/CREATENEWREPORT/${UserId}/${Schetchik_.id}/${response1.data.results[response1.data.count-1]['meter']}/${response1.data.results[response1.data.count-1]['qr']}`).then(async function(response3) {
+                  const Schetchik1 = await Schetchik_data.create({
+                    number_schet:number_schet,
+                    name:name,
+                    photo:`/${namePhoto}.jpeg`,
+                    zadolz_po_schetchiku:response3.data.arrears,
+                    data:data,
+                    SchetchikId:Schetchik_.id,
+                    latitude:latitude,
+                    longitude:longitude,
+                    unpaid:response3.data.unpaid,
+                    arrears:response3.data.arrears,
+                    meterdata:response3.data.meterdata,
+        
+                  });
+                console.log(response3.data)  
+                return res.json(Schetchik1)
+        
+                })
+              }
+        
+            })
+        
+               
+                }).catch(function(error) {
+                  console.log(error)
+                  console.log('response1')
+                })
+
+              })
+
+
+     
+      
+
+
+
+               
+
+
+
+        //  var formData = new FormData();   
+        //  URL = "http://localhost:5002/file.png";    
+        //  var x;
+         
+        //  var request = new XMLHttpRequest()
+        //  request.responseType = "blob"
+        //  request.onload = function() {
+        //    formData.append("image", request.response);
+        //    x = new XMLHttpRequest();
+        //    x.open("POST","http://79.174.92.222:8000/upload-image/",true);
+        //    x.setRequestHeader("Content-type", "multipart/form-data");
+        //    x.setRequestHeader("Content-Length", formData.length);
+        //    x.send(formData);
+        //  }
+        //  request.open("GET", URL);
+        //  request.send();
+
+
+
+
+
+
+
+
+
+        //  const form = new FormData();
+        //  form.append('image', fs.createReadStream(`./static/${namePhoto}.jpeg`));
+
+        // await axios.post('http://79.174.92.222:8000/upload-image/', form,{
+        //         headers: {
+        //           'Content-Type': 'multipart/form-data'
+        //         }
+        //       }).then(({data})=> console.log(data));
+
+
+        //  const resp = await axios.post('http://79.174.92.222:8000/upload-image/',form)
+        //     .then(function(response1) {
+        //       console.log('response1')
+        //      console.log(response1)
+        //     }).catch(function(error) {
+        //       console.log(error)
+        //       console.log('response1')
+        //     })
+      }
+        )
+        
+
+ 
+
 }
 
+async createSchetchiki1(req, res) {
+  const {number_schet,name,photo,zadolz_po_schetchiku,data,SchetchikId,latitude,longitude,namePhoto,UserId} = req.body
+
+
+ console.log(SchetchikId)
+  var base64Data = photo.split(",")[1];// split with `,`
+
+   const aa = require("fs").writeFile(`./static/${namePhoto}.jpeg`, base64Data, 'base64', 
+   async function(err, data) {
+       if (err) {
+      console.log('err', err);
+         }
+         let stats = fs.statSync(`./static/${namePhoto}.jpeg`)
+
+        //  const resp1 = await axios.post('http://79.174.92.222:8000/upload-image/',formData)
+        //     .then(function(response1) {
+        //       console.log('response1')
+        //      console.log(response1)
+        //      return
+        //     }).catch(function(error) {
+        //       console.log(error)
+        //       console.log('response1')
+        //     })
+      
+
+         const form = new FormData();
+         form.append('image', fs.createReadStream(`./static/sh.jpeg`));
+
+         await axios.post('http://79.174.92.222:8000/upload-image/', form,{
+                headers: {
+                  'Content-Type': 'multipart/form-data'
+                }
+              }).then(async function(response20) {
+
+                const resp = await  axios.get('http://79.174.92.222:8000/api/data/?limit=1005')
+                .then(async function(response1) {
+                  console.log('response1')
+                 console.log(response1.data.count)
+                 console.log(response1.data.results[response1.data.count-1]['meter'])
+                 console.log(response1.data.results[response1.data.count-1]['qr']==[])
+                 const opo1 = await axios.post(`http://s5.oooblako.ru/systema_base1/hs/KVK_API_NEWMETER/CREATENEWMETER/${UserId}/${SchetchikId}`).then(async function(response2) {
+        
+                 
+                 if(response1.data.results[response1.data.count-1]['qr']==[]){
+                  const opo = await axios.post(`http://s5.oooblako.ru/systema_base1/hs/KVK_API_NEWREPORT/CREATENEWREPORT/${UserId}/${SchetchikId}/${response1.data.results[response1.data.count-1]['meter']}/0000000`).then(async function(response3) {
+        
+                  const Schetchik1 = await Schetchik_data.create({
+                    number_schet:number_schet,
+                    name:name,
+                    photo:`/${namePhoto}.jpeg`,
+                    zadolz_po_schetchiku:response3.data.arrears,
+                    data:data,
+                    SchetchikId:SchetchikId,
+                    latitude:latitude,
+                    longitude:longitude,
+                    unpaid:response3.data.unpaid,
+                    arrears:response3.data.arrears,
+                    meterdata:response3.data.meterdata,
+        
+                  });
+                  О
+                  console.log(response3.data)
+                  return res.json(Schetchik1)
+                 })
+            
+                }else{
+                const opo = await axios.post(`http://s5.oooblako.ru/systema_base1/hs/KVK_API_NEWREPORT/CREATENEWREPORT/${UserId}/${SchetchikId}/${response1.data.results[response1.data.count-1]['meter']}/${response1.data.results[response1.data.count-1]['qr']}`).then(async function(response3) {
+                  const Schetchik1 = await Schetchik_data.create({
+                    number_schet:number_schet,
+                    name:name,
+                    photo:`/${namePhoto}.jpeg`,
+                    zadolz_po_schetchiku:response3.data.arrears,
+                    data:data,
+                    SchetchikId:SchetchikId,
+                    latitude:latitude,
+                    longitude:longitude,
+                    unpaid:response3.data.unpaid,
+                    arrears:response3.data.arrears,
+                    meterdata:response3.data.meterdata,
+        
+                  });
+                console.log(response3.data)  
+                return res.json(Schetchik1)
+        
+                })
+              }
+        
+            })
+        
+               
+                }).catch(function(error) {
+                  console.log(error)
+                  console.log('response1')
+                })
+
+              })
+
+
+     
+      
+
+
+
+               
+
+
+
+        //  var formData = new FormData();   
+        //  URL = "http://localhost:5002/file.png";    
+        //  var x;
+         
+        //  var request = new XMLHttpRequest()
+        //  request.responseType = "blob"
+        //  request.onload = function() {
+        //    formData.append("image", request.response);
+        //    x = new XMLHttpRequest();
+        //    x.open("POST","http://79.174.92.222:8000/upload-image/",true);
+        //    x.setRequestHeader("Content-type", "multipart/form-data");
+        //    x.setRequestHeader("Content-Length", formData.length);
+        //    x.send(formData);
+        //  }
+        //  request.open("GET", URL);
+        //  request.send();
+
+
+
+
+
+
+
+
+
+        //  const form = new FormData();
+        //  form.append('image', fs.createReadStream(`./static/${namePhoto}.jpeg`));
+
+        // await axios.post('http://79.174.92.222:8000/upload-image/', form,{
+        //         headers: {
+        //           'Content-Type': 'multipart/form-data'
+        //         }
+        //       }).then(({data})=> console.log(data));
+
+
+        //  const resp = await axios.post('http://79.174.92.222:8000/upload-image/',form)
+        //     .then(function(response1) {
+        //       console.log('response1')
+        //      console.log(response1)
+        //     }).catch(function(error) {
+        //       console.log(error)
+        //       console.log('response1')
+        //     })
+      }
+        )
+        
+
+ 
+
+}
 async createSchetchiki_by_data(req, res) {
   const {number_schet,name,photo,zadolz_po_schetchiku,data,SchetchikId} = req.body
   const Schetchik1 = await Schetchik_data.create({

@@ -10,18 +10,24 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
+    "axios": "^1.7.2",
     "bcrypt": "^5.1.0",
     "cors": "^2.8.5",
+    "cross-blob": "^3.0.2",
     "dotenv": "^16.0.3",
     "express": "^4.18.2",
     "express-fileupload": "^1.4.0",
+    "form-data": "^4.0.0",
+    "formdata-node": "^6.0.3",
     "https": "^1.0.0",
     "jsonwebtoken": "^9.0.0",
     "nodemailer": "^6.9.3",
     "pg": "^8.10.0",
     "pg-hstore": "^2.3.4",
+    "request": "^2.88.2",
     "sequelize": "^6.29.3",
-    "uuid": "^9.0.0"
+    "uuid": "^9.0.0",
+    "xmlhttprequest": "^1.8.0"
   },
   "devDependencies": {
     "nodemon": "^2.0.21"
