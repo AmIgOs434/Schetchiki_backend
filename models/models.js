@@ -29,7 +29,7 @@ const Schetchik_data = sequelize.define('Schetchik_data', {
     zadolz_po_schetchiku: {type: DataTypes.STRING},
     latitude: {type: DataTypes.STRING},
     longitude: {type: DataTypes.STRING},
-
+    select: {type: DataTypes.INTEGER,defaultValue:1},
     unpaid:{type: DataTypes.STRING},
     arrears:{type: DataTypes.STRING},
     meterdata:{type: DataTypes.STRING},
